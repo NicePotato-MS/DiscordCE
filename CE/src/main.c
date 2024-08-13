@@ -32,18 +32,14 @@ void loop() {
     if (serial_has_device) {
         if (keyboard_key_states[KEY_YEQU]) {
             while (keyboard_key_states[KEY_YEQU]) { keyboard_UpdateKeyStates(); }
-            serial_SendPacketHeader(0, PACKET_DEBUG_PFP_TEST);
+            serial_SendPacketHeader(0, PACKET_DEBUG_REQUEST_PFP_TEST);
         }
 
         serial_ReceivePacket();
     }
 
-    if (keyboard_key_states[KEY_DEL]) {
-        exception_LogInfoString(0, "Logged String");
-        exception_LogInfoUint(1, 69);
-        exception_LogInfoInt(2, -420);
-        exception_LogInfoNamedUint(3, "Boobie", 800813);
-        exception_LogInfoNamedInt(4, "Leet", -1337);
+    if (keyboard_HasKeyBeenHeldFor(KEY_MODE, CLOCKS_PER_SEC)) {
+        exception_LogInfoInt(0, -420);
         exception_Crash(CONDITION_SUCCESS);
     }
 }

@@ -73,13 +73,21 @@
 
 clock_t keyboard_key_states[56]; 
 
-uint8_t key_offset;
+unsigned int key_offset;
+
+inline bool keyboard_HasKeyBeenHeldFor(unsigned int key, clock_t time) {
+    return keyboard_key_states[key] && clock_ElapsedTimeSince(keyboard_key_states[key]) > time;
+}
+
+inline bool keyboard_IsKeyDown(unsigned int key) {
+    return keyboard_key_states[key];
+}
 
 void keyboard_UpdateKeyStates() {
     kb_Scan();
     key_offset = 0;
-    for (uint8_t keyGroup = 1; keyGroup<8; keyGroup++) {
-        for (uint8_t currentKey = 0; currentKey<8; currentKey++) {
+    for (unsigned int keyGroup = 1; keyGroup<8; keyGroup++) {
+        for (unsigned int currentKey = 0; currentKey<8; currentKey++) {
             if ((kb_Data[keyGroup] & (1 << currentKey)) != 0) {
                 if(!keyboard_key_states[key_offset]) {
                     keyboard_key_states[key_offset] = clock_current_clock;

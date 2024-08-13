@@ -4,8 +4,8 @@ import asyncio
 import struct
 from PIL import Image
 from images import encode_image
+from config import SERIAL_PORT
 
-SERIAL_PORT = '/dev/ttyACM0'
 BAUD_RATE = 115200
 
 serial_lock = threading.Lock()
@@ -24,16 +24,18 @@ async def init_serial():
             # print(e)
             await asyncio.sleep(0.25)
 
-def int_to_3_bytes(value):
-    if not (0 <= value < 2**24):
-        raise ValueError("Value must be in the range 0 to 16777215 (0xFFFFFF).")
-    return struct.pack('<I', value)[:3]
+def int_to_uint24(value):
+    return bytes([
+        value & 0xFF,
+        (value >> 8) & 0xFF,
+        (value >> 16) & 0xFF,
+    ])
 
 def send_packet(packet_type, data):
     serial_port.write(b'DC')
-    serial_port.write(int_to_3_bytes(len(data)))
-    serial_port.write(int_to_3_bytes(packet_type))
-    # serial_port.write(data)
+    serial_port.write(int_to_uint24(len(data)))
+    serial_port.write(int_to_uint24(packet_type))
+    serial_port.write(data)
 
 def read_int(size):
     return int.from_bytes(serial_port.read(size), "little")
@@ -46,7 +48,7 @@ async def read_serial():
     
     magic = serial_port.read(2)
     if magic != b'DC':
-        print("Recieved Corrupted Packet!")
+        print("Received Corrupted Packet!")
         serial_port.close()
         serial_port = None
         return False
@@ -65,7 +67,15 @@ async def read_serial():
             print(f"C: {struct.unpack('<Q', data)[0]}")
         case 2: # Debug print int64_t
             print(f"C: {struct.unpack('<q', data)[0]}")
-        case 3: # Device Exception
+        case 3: # Debug print named uint64_t
+            print(f"C: {data[8:].decode('ascii')}: {struct.unpack('<Q', data[:8])[0]}")
+        case 4: # Debug print named int64_t
+            print(f"C: {data[8:].decode('ascii')}: {struct.unpack('<q', data[:8])[0]}")
+        case 5: # Debug print bytes
+            print(f"C: {data}")
+
+
+        case 32: # Device Exception
             print("**DEVICE EXCEPTION**")
         
         case 128: # Debug send pfp
@@ -74,10 +84,10 @@ async def read_serial():
             image = image.convert('RGB')
 
             encoded = encode_image(image, (24,24))
-            print("Sending pfp")
+            print(len(encoded))
 
-            send_packet(0, encoded)
-            print("done")
+            send_packet(128, encoded)
+            print("packet sent")
 
         case _:
             print("Unknown Packet type recieved!")

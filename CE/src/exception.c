@@ -109,7 +109,7 @@ void exception_Crash(int condition) {
             case EXCEPTION_TYPE_INT:
                 gfx_SetTextXY(2, y);
                 gfx_PrintInt(info->data_1.signed_num, 1);
-                serial_DebugPrintSigned(info->data_2.signed_num);
+                serial_DebugPrintSigned(info->data_1.signed_num);
                 break;
             case EXCEPTION_TYPE_NAMED_UINT:
                 gfx_PrintStringXY(info->data_1.ptr, 2, y);
@@ -118,7 +118,7 @@ void exception_Crash(int condition) {
                 gfx_PrintChar(':');
                 gfx_SetTextXY(x + 14, y);
                 gfx_PrintUInt(info->data_2.unsigned_num, 1);
-                serial_DebugPrintUnsigned(info->data_2.unsigned_num);
+                serial_DebugPrintNamedUnsigned(info->data_1.ptr, info->data_2.unsigned_num);
                 break;
             case EXCEPTION_TYPE_NAMED_INT:
                 gfx_PrintStringXY(info->data_1.ptr, 2, y);
@@ -127,7 +127,7 @@ void exception_Crash(int condition) {
                 gfx_PrintChar(':');
                 gfx_SetTextXY(x + 14, y);
                 gfx_PrintInt(info->data_2.signed_num, 1);
-                serial_DebugPrintSigned(info->data_2.signed_num);
+                serial_DebugPrintNamedSigned(info->data_1.ptr, info->data_2.signed_num);
                 break;
         }
     }

@@ -44,7 +44,7 @@ __kernel void nearest_color(__global const float *image_data,
 
 program = cl.Program(context, kernel_code).build()
 
-def encode_image(image: Image.Image, resolution: tuple) -> Image.Image:
+def encode_image(image: Image.Image, resolution: tuple):
     image = image.resize(resolution)
     
     data = np.array(image, dtype=np.float32)
@@ -60,4 +60,4 @@ def encode_image(image: Image.Image, resolution: tuple) -> Image.Image:
     output_data = np.empty(width * height, dtype=np.uint8)  # Flattened output array
     cl.enqueue_copy(queue, output_data, output_buffer).wait()
     
-    return output_data
+    return output_data.tobytes()
