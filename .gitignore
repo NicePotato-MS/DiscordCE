@@ -1,0 +1,7 @@
+venv
+*.o
+*.bin
+*.map
+*.src
+*.d
+*.bc

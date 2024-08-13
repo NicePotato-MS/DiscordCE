@@ -1,0 +1,29 @@
+{
+    "files.associations": {
+        "*.in": "makefile",
+        "*.ld": "mapfile",
+        "*.assetdb": "jsonc",
+        "*.assetset": "jsonc",
+        "*.tooldb": "jsonc",
+        "*.toolset": "jsonc",
+        "*.sobdb": "jsonc",
+        "*.sobset": "jsonc",
+        "*.projectileset": "jsonc",
+        "*.shapedb": "jsonc",
+        "*.shapeset": "jsonc",
+        "*.rotationset": "jsonc",
+        "*.meleeattackset": "jsonc",
+        "*.kinematicdb": "jsonc",
+        "*.kinematicset": "jsonc",
+        "*.harvestabledb": "jsonc",
+        "*.harvestableset": "jsonc",
+        "*.effectdb": "jsonc",
+        "*.effectset": "jsonc",
+        "*.characterdb": "jsonc",
+        "*.characterset": "jsonc",
+        "*.world": "jsonc",
+        "*.inc": "platformio-debug.asm",
+        "string": "c",
+        "format": "c"
+    }
+}

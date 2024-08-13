@@ -1,0 +1,1 @@
+DISCORD_TOKEN = "user_token"

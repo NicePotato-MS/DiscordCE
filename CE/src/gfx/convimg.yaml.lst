@@ -1,0 +1,7 @@
+main_palette.h
+main_palette.c
+pic_discord_selected.h
+pic_discord_selected.c
+pic_discord_unselected.h
+pic_discord_unselected.c
+gfx.h

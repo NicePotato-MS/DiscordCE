@@ -1,0 +1,6 @@
+numpy
+matplotlib
+pillow
+pyserial
+pyopencl
+siphash24
