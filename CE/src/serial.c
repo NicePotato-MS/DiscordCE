@@ -4,6 +4,7 @@
 
 #include <srldrvce.h>
 #include <fontlibc.h>
+#include <graphx.h>
 #include <sys/timers.h>
 
 #include "font.h"
@@ -13,7 +14,7 @@
 srl_device_t serial_Device;
 bool serial_has_device = false;
 bool serial_connected = false;
-uint8_t serial_Buffer[1024];
+uint8_t serial_Buffer[2048];
 
 static usb_error_t handle_usb_event(usb_event_t event, void *event_data, usb_callback_data_t *callback_data __attribute__((unused))) {
     usb_error_t err;
@@ -147,10 +148,12 @@ unsigned int data_size;
 unsigned int packet_type;
 
 void serial_ReceivePacket() {
+    int bytes_read;
+
     if (!serial_has_device) { return; }
 
     if (packet_index < 8) {
-        int bytes_read = srl_Read(&serial_Device, &packet[packet_index], 8 - packet_index);
+        bytes_read = srl_Read(&serial_Device, &packet[packet_index], 8 - packet_index);
         packet_index += bytes_read;
         if (packet_index < 8) { return; } else {
             data_size = *((unsigned int *)(&packet[2]));
@@ -171,14 +174,31 @@ void serial_ReceivePacket() {
         exception_Crash(CONDITION_CORRUPTED_PACKET);
     }
 
-    int bytes_read = srl_Read(&serial_Device, &packet[packet_index], data_size - packet_index - 8);
+    bytes_read = srl_Read(&serial_Device, &packet[packet_index], data_size - packet_index + 8);
     packet_index += bytes_read;
     if (packet_index - 8 < data_size) { return; }
 
-    serial_DebugPrint("Header");
-    serial_DebugPrintBytes(&packet, 8);
-    serial_DebugPrint("Data");
-    serial_DebugPrintBytes(&packet[8], data_size);
+    uint8_t *packet_data = &packet[8];
+
+    switch (packet_type) {
+        case PACKET_DEBUG_PFP_TEST:
+            for (unsigned int y = 0; y < 24; y++) {
+                for (unsigned int x = 0; x < 24; x++) {
+                    gfx_vram[(55 + GFX_LCD_WIDTH * 15) + (x + GFX_LCD_WIDTH * y)] = packet_data[x + y * 24];
+                }
+            }
+
+            // for (unsigned int y = 0; y < 24; y++) {
+            //     for (unsigned int x = 0; x < 24; x++) {
+            //         for (unsigned int p_y = 0; p_y < 4; p_y++) {
+            //             for (unsigned int p_x = 0; p_x < 4; p_x++) {
+            //                 gfx_vram[(55 + GFX_LCD_WIDTH * 15) + ((x * 4 + p_x) + GFX_LCD_WIDTH * (y * 4 + p_y))] = packet_data[x + y * 24];
+            //             }
+            //         }
+            //     }
+            // }
+            break;
+    }
 
     packet_index = 0;
 }

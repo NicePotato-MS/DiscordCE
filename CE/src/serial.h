@@ -13,7 +13,7 @@
 
 #define PACKET_EXCEPTION_OCCURED 32
 
-#define PACKET_DEBUG_REQUEST_PFP_TEST 128
+#define PACKET_DEBUG_PFP_TEST 128
 
 extern srl_device_t serial_Device;
 extern bool serial_has_device;

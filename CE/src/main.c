@@ -32,7 +32,7 @@ void loop() {
     if (serial_has_device) {
         if (keyboard_key_states[KEY_YEQU]) {
             while (keyboard_key_states[KEY_YEQU]) { keyboard_UpdateKeyStates(); }
-            serial_SendPacketHeader(0, PACKET_DEBUG_REQUEST_PFP_TEST);
+            serial_SendPacketHeader(0, PACKET_DEBUG_PFP_TEST);
         }
 
         serial_ReceivePacket();

@@ -1,24 +1,21 @@
 import serial
-import threading
 import asyncio
 import struct
-from PIL import Image
+from PIL import Image, ImageDraw, ImageOps
 from images import encode_image
 from config import SERIAL_PORT
 
 BAUD_RATE = 115200
 
-serial_lock = threading.Lock()
+serial_lock = asyncio.Lock()
 serial_port = None
-
-    
 
 async def init_serial():
     global serial_port
     print("Serial device is asleep.")
     while not serial_port:
         try:
-            serial_port = serial.Serial(SERIAL_PORT, BAUD_RATE, timeout=1, stopbits=serial.STOPBITS_TWO)
+            serial_port = serial.Serial(SERIAL_PORT, BAUD_RATE, timeout=1, stopbits=serial.STOPBITS_TWO, write_timeout=1)
             print("Serial device connected.")
         except serial.SerialException as e:
             # print(e)
@@ -32,6 +29,8 @@ def int_to_uint24(value):
     ])
 
 def send_packet(packet_type, data):
+    if len(data) > 1016:
+        raise Exception("Outgoing packet too large!")
     serial_port.write(b'DC')
     serial_port.write(int_to_uint24(len(data)))
     serial_port.write(int_to_uint24(packet_type))
@@ -95,14 +94,11 @@ async def read_serial():
             serial_port = None
             return
 
-
-
-
 async def serial_reader():
     global serial_port
     global poll_cache
     while True:
-        with serial_lock:
+        async with serial_lock:
             if serial_port:
                 try:
                     await read_serial()
